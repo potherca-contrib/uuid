@@ -9,8 +9,6 @@ use AspectMock\Test as AspectMock;
 class SystemNodeProviderTest extends TestCase
 {
     /**
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
      */
     public function testGetNodeReturnsSystemNodeFromMacAddress()
     {
@@ -35,8 +33,6 @@ class SystemNodeProviderTest extends TestCase
     }
 
     /**
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
      * @dataProvider notationalFormatsDataProvider
      * @param $formatted
      * @param $expected
@@ -52,8 +48,6 @@ class SystemNodeProviderTest extends TestCase
     }
 
     /**
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
      */
     public function testGetNodeReturnsFirstMacAddressFound()
     {
@@ -69,8 +63,6 @@ class SystemNodeProviderTest extends TestCase
     }
 
     /**
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
      */
     public function testGetNodeReturnsFalseWhenNodeIsNotFound()
     {
@@ -83,8 +75,6 @@ class SystemNodeProviderTest extends TestCase
     }
 
     /**
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
      */
     public function testGetNodeWillNotExecuteSystemCallIfFailedFirstTime()
     {
@@ -107,8 +97,6 @@ class SystemNodeProviderTest extends TestCase
     }
 
     /**
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
      * @dataProvider osCommandDataProvider
      * @param $os
      * @param $command
@@ -125,8 +113,6 @@ class SystemNodeProviderTest extends TestCase
     }
 
     /**
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
      */
     public function testGetNodeReturnsSameNodeUponSubsequentCalls()
     {
@@ -140,8 +126,6 @@ class SystemNodeProviderTest extends TestCase
     }
 
     /**
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
      */
     public function testSubsequentCallsToGetNodeDoNotRecallIfconfig()
     {

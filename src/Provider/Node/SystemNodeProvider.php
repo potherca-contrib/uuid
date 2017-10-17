@@ -26,6 +26,10 @@ class SystemNodeProvider implements NodeProviderInterface
      * @var string
      */
     private $ifconfig;
+    /**
+     * @var string
+     */
+    private $node;
 
     /**
      * Returns the system node ID
@@ -34,24 +38,22 @@ class SystemNodeProvider implements NodeProviderInterface
      */
     public function getNode()
     {
-        static $node = null;
+        if ($this->node === null) {
 
-        if ($node !== null) {
-            return $node;
+            $pattern = '/[^:]([0-9A-Fa-f]{2}([:-])[0-9A-Fa-f]{2}(\2[0-9A-Fa-f]{2}){4})[^:]/';
+            $matches = array();
+
+            // Search the ifconfig output for all MAC addresses and return
+            // the first one found
+            $node = false;
+            if (preg_match_all($pattern, $this->getIfconfig(), $matches, PREG_PATTERN_ORDER)) {
+                $node = $matches[1][0];
+                $node = str_replace([':', '-'], '', $node);
+            }
+            $this->node = $node;
         }
 
-        $pattern = '/[^:]([0-9A-Fa-f]{2}([:-])[0-9A-Fa-f]{2}(\2[0-9A-Fa-f]{2}){4})[^:]/';
-        $matches = array();
-
-        // Search the ifconfig output for all MAC addresses and return
-        // the first one found
-        $node = false;
-        if (preg_match_all($pattern, $this->getIfconfig(), $matches, PREG_PATTERN_ORDER)) {
-            $node = $matches[1][0];
-            $node = str_replace([':', '-'], '', $node);
-        }
-
-        return $node;
+        return $this->node;
     }
 
     /**

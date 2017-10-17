@@ -14,9 +14,7 @@ class SystemNodeProviderTest extends TestCase
      */
     public function testGetNodeReturnsSystemNodeFromMacAddress()
     {
-        $provider = $this->getMockBuilder('Ramsey\Uuid\Provider\Node\SystemNodeProvider')
-            ->setMethods(['getIfconfig'])
-            ->getMock();
+        $provider = new SystemNodeProvider();
 
         $this->setIfconfig($provider, PHP_EOL . 'AA-BB-CC-DD-EE-FF' . PHP_EOL);
 
@@ -45,10 +43,7 @@ class SystemNodeProviderTest extends TestCase
      */
     public function testGetNodeReturnsNodeStrippedOfNotationalFormatting($formatted, $expected)
     {
-        //Using a stub to provide data for the protected method that gets the node
-        $provider = $this->getMockBuilder('Ramsey\Uuid\Provider\Node\SystemNodeProvider')
-            ->setMethods(['getIfconfig'])
-            ->getMock();
+        $provider = new SystemNodeProvider();
 
         $this->setIfconfig($provider, PHP_EOL . $formatted . PHP_EOL);
 
@@ -62,10 +57,7 @@ class SystemNodeProviderTest extends TestCase
      */
     public function testGetNodeReturnsFirstMacAddressFound()
     {
-        //Using a stub to provide data for the protected method that gets the node
-        $provider = $this->getMockBuilder('Ramsey\Uuid\Provider\Node\SystemNodeProvider')
-            ->setMethods(['getIfconfig'])
-            ->getMock();
+        $provider = new SystemNodeProvider();
 
         $this->setIfconfig(
             $provider,
@@ -82,10 +74,7 @@ class SystemNodeProviderTest extends TestCase
      */
     public function testGetNodeReturnsFalseWhenNodeIsNotFound()
     {
-        //Using a stub to provide data for the protected method that gets the node
-        $provider = $this->getMockBuilder('Ramsey\Uuid\Provider\Node\SystemNodeProvider')
-            ->setMethods(['getIfconfig'])
-            ->getMock();
+        $provider = new SystemNodeProvider();
 
         $this->setIfconfig($provider, 'some string that does not match the mac address');
 
@@ -99,10 +88,7 @@ class SystemNodeProviderTest extends TestCase
      */
     public function testGetNodeWillNotExecuteSystemCallIfFailedFirstTime()
     {
-        //Using a stub to provide data for the protected method that gets the node
-        $provider = $this->getMockBuilder('Ramsey\Uuid\Provider\Node\SystemNodeProvider')
-            ->setMethods(['getIfconfig'])
-            ->getMock();
+        $provider = new SystemNodeProvider();
 
         $this->setIfconfig($provider, 'some string that does not match the mac address');
 
@@ -144,10 +130,7 @@ class SystemNodeProviderTest extends TestCase
      */
     public function testGetNodeReturnsSameNodeUponSubsequentCalls()
     {
-        //Using a stub to provide data for the protected method that gets the node
-        $provider = $this->getMockBuilder('Ramsey\Uuid\Provider\Node\SystemNodeProvider')
-            ->setMethods(['getIfconfig'])
-            ->getMock();
+        $provider = new SystemNodeProvider();
 
         $this->setIfconfig($provider, PHP_EOL . 'AA-BB-CC-DD-EE-FF' . PHP_EOL);
 
@@ -162,20 +145,20 @@ class SystemNodeProviderTest extends TestCase
      */
     public function testSubsequentCallsToGetNodeDoNotRecallIfconfig()
     {
-        //Using a stub to provide data for the protected method that gets the node
-        $provider = $this->getMockBuilder('Ramsey\Uuid\Provider\Node\SystemNodeProvider')
-            ->setMethods(['getIfconfig'])
-            ->getMock();
+        $provider = new SystemNodeProvider();
 
         $this->setIfconfig($provider, PHP_EOL . 'AA-BB-CC-DD-EE-FF' . PHP_EOL);
+
         $provider->getNode();
         $provider->getNode();
     }
 
     private function setIfconfig($provider, $value)
     {
-        $provider->expects($this->once())
-            ->method('getIfconfig')
-            ->willReturn($value);
+        $reflectionObject = new \ReflectionObject($provider);
+        $reflectionProperty = $reflectionObject->getProperty('ifconfig');
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue($provider, $value);
+        $reflectionProperty->setAccessible(false);
     }
 }

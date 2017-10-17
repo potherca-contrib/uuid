@@ -18,9 +18,7 @@ class SystemNodeProviderTest extends TestCase
             ->setMethods(['getIfconfig'])
             ->getMock();
 
-        $provider->expects($this->once())
-            ->method('getIfconfig')
-            ->willReturn(PHP_EOL . 'AA-BB-CC-DD-EE-FF' . PHP_EOL);
+        $this->setIfconfig($provider, PHP_EOL . 'AA-BB-CC-DD-EE-FF' . PHP_EOL);
 
         $node = $provider->getNode();
 
@@ -29,7 +27,6 @@ class SystemNodeProviderTest extends TestCase
         $lengthError = 'Node should be 12 characters. Actual length: ' . $length . PHP_EOL . ' Actual node: ' . $node;
         $this->assertTrue(($length === 12), $lengthError);
     }
-
 
     public function notationalFormatsDataProvider()
     {
@@ -52,8 +49,8 @@ class SystemNodeProviderTest extends TestCase
         $provider = $this->getMockBuilder('Ramsey\Uuid\Provider\Node\SystemNodeProvider')
             ->setMethods(['getIfconfig'])
             ->getMock();
-        $provider->method('getIfconfig')
-            ->willReturn(PHP_EOL . $formatted . PHP_EOL);
+
+        $this->setIfconfig($provider, PHP_EOL . $formatted . PHP_EOL);
 
         $node = $provider->getNode();
         $this->assertEquals($expected, $node);
@@ -69,10 +66,11 @@ class SystemNodeProviderTest extends TestCase
         $provider = $this->getMockBuilder('Ramsey\Uuid\Provider\Node\SystemNodeProvider')
             ->setMethods(['getIfconfig'])
             ->getMock();
-        $provider->method('getIfconfig')
-            ->willReturn(PHP_EOL . 'AA-BB-CC-DD-EE-FF' . PHP_EOL .
-                '00-11-22-33-44-55' . PHP_EOL .
-                'FF-11-EE-22-DD-33' . PHP_EOL);
+
+        $this->setIfconfig(
+            $provider,
+            PHP_EOL . 'AA-BB-CC-DD-EE-FF' . PHP_EOL . '00-11-22-33-44-55' . PHP_EOL . 'FF-11-EE-22-DD-33' . PHP_EOL
+        );
 
         $node = $provider->getNode();
         $this->assertEquals('AABBCCDDEEFF', $node);
@@ -84,13 +82,12 @@ class SystemNodeProviderTest extends TestCase
      */
     public function testGetNodeReturnsFalseWhenNodeIsNotFound()
     {
+        //Using a stub to provide data for the protected method that gets the node
         $provider = $this->getMockBuilder('Ramsey\Uuid\Provider\Node\SystemNodeProvider')
             ->setMethods(['getIfconfig'])
             ->getMock();
 
-        $provider->expects($this->once())
-            ->method('getIfconfig')
-            ->willReturn('some string that does not match the mac address');
+        $this->setIfconfig($provider, 'some string that does not match the mac address');
 
         $node = $provider->getNode();
         $this->assertFalse($node);
@@ -102,13 +99,12 @@ class SystemNodeProviderTest extends TestCase
      */
     public function testGetNodeWillNotExecuteSystemCallIfFailedFirstTime()
     {
+        //Using a stub to provide data for the protected method that gets the node
         $provider = $this->getMockBuilder('Ramsey\Uuid\Provider\Node\SystemNodeProvider')
             ->setMethods(['getIfconfig'])
             ->getMock();
 
-        $provider->expects($this->once())
-            ->method('getIfconfig')
-            ->willReturn('some string that does not match the mac address');
+        $this->setIfconfig($provider, 'some string that does not match the mac address');
 
         $provider->getNode();
         $provider->getNode();
@@ -152,8 +148,8 @@ class SystemNodeProviderTest extends TestCase
         $provider = $this->getMockBuilder('Ramsey\Uuid\Provider\Node\SystemNodeProvider')
             ->setMethods(['getIfconfig'])
             ->getMock();
-        $provider->method('getIfconfig')
-            ->willReturn(PHP_EOL . 'AA-BB-CC-DD-EE-FF' . PHP_EOL);
+
+        $this->setIfconfig($provider, PHP_EOL . 'AA-BB-CC-DD-EE-FF' . PHP_EOL);
 
         $node = $provider->getNode();
         $node2 = $provider->getNode();
@@ -166,14 +162,20 @@ class SystemNodeProviderTest extends TestCase
      */
     public function testSubsequentCallsToGetNodeDoNotRecallIfconfig()
     {
-        //Using a mock to verify the provider only gets the node from ifconfig one time
+        //Using a stub to provide data for the protected method that gets the node
         $provider = $this->getMockBuilder('Ramsey\Uuid\Provider\Node\SystemNodeProvider')
             ->setMethods(['getIfconfig'])
             ->getMock();
+
+        $this->setIfconfig($provider, PHP_EOL . 'AA-BB-CC-DD-EE-FF' . PHP_EOL);
+        $provider->getNode();
+        $provider->getNode();
+    }
+
+    private function setIfconfig($provider, $value)
+    {
         $provider->expects($this->once())
             ->method('getIfconfig')
-            ->willReturn(PHP_EOL . 'AA-BB-CC-DD-EE-FF' . PHP_EOL);
-        $provider->getNode();
-        $provider->getNode();
+            ->willReturn($value);
     }
 }

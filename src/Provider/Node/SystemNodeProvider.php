@@ -23,6 +23,11 @@ use Ramsey\Uuid\Provider\NodeProviderInterface;
 class SystemNodeProvider implements NodeProviderInterface
 {
     /**
+     * @var string
+     */
+    private $ifconfig;
+
+    /**
      * Returns the system node ID
      *
      * @return string|false System node ID as a hexadecimal string, or false if it is not found
@@ -57,20 +62,24 @@ class SystemNodeProvider implements NodeProviderInterface
      */
     protected function getIfconfig()
     {
-        ob_start();
-        switch (strtoupper(substr(php_uname('a'), 0, 3))) {
-            case 'WIN':
-                passthru('ipconfig /all 2>&1');
-                break;
-            case 'DAR':
-                passthru('ifconfig 2>&1');
-                break;
-            case 'LIN':
-            default:
-                passthru('netstat -ie 2>&1');
-                break;
+        if ($this->ifconfig === null) {
+            ob_start();
+            switch (strtoupper(substr(php_uname('a'), 0, 3))) {
+                case 'WIN':
+                    passthru('ipconfig /all 2>&1');
+                    break;
+                case 'DAR':
+                    passthru('ifconfig 2>&1');
+                    break;
+                case 'LIN':
+                default:
+                    passthru('netstat -ie 2>&1');
+                    break;
+            }
+
+            $this->ifconfig = ob_get_clean();
         }
 
-        return ob_get_clean();
+        return $this->ifconfig;
     }
 }

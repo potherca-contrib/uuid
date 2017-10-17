@@ -32,6 +32,14 @@ class SystemNodeProvider implements NodeProviderInterface
     private $node;
 
     /**
+     * @param string|null $ifconfig
+     */
+    public function __construct($ifconfig = null)
+    {
+        $this->ifconfig = $ifconfig;
+    }
+
+    /**
      * Returns the system node ID
      *
      * @return string|false System node ID as a hexadecimal string, or false if it is not found

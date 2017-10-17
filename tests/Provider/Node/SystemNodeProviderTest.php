@@ -12,9 +12,7 @@ class SystemNodeProviderTest extends TestCase
      */
     public function testGetNodeReturnsSystemNodeFromMacAddress()
     {
-        $provider = new SystemNodeProvider();
-
-        $this->setIfconfig($provider, PHP_EOL . 'AA-BB-CC-DD-EE-FF' . PHP_EOL);
+        $provider = new SystemNodeProvider(PHP_EOL . 'AA-BB-CC-DD-EE-FF' . PHP_EOL);
 
         $node = $provider->getNode();
 
@@ -39,9 +37,7 @@ class SystemNodeProviderTest extends TestCase
      */
     public function testGetNodeReturnsNodeStrippedOfNotationalFormatting($formatted, $expected)
     {
-        $provider = new SystemNodeProvider();
-
-        $this->setIfconfig($provider, PHP_EOL . $formatted . PHP_EOL);
+        $provider = new SystemNodeProvider(PHP_EOL . $formatted . PHP_EOL);
 
         $node = $provider->getNode();
         $this->assertEquals($expected, $node);
@@ -51,12 +47,7 @@ class SystemNodeProviderTest extends TestCase
      */
     public function testGetNodeReturnsFirstMacAddressFound()
     {
-        $provider = new SystemNodeProvider();
-
-        $this->setIfconfig(
-            $provider,
-            PHP_EOL . 'AA-BB-CC-DD-EE-FF' . PHP_EOL . '00-11-22-33-44-55' . PHP_EOL . 'FF-11-EE-22-DD-33' . PHP_EOL
-        );
+        $provider = new SystemNodeProvider(PHP_EOL . 'AA-BB-CC-DD-EE-FF' . PHP_EOL . '00-11-22-33-44-55' . PHP_EOL . 'FF-11-EE-22-DD-33' . PHP_EOL);
 
         $node = $provider->getNode();
         $this->assertEquals('AABBCCDDEEFF', $node);
@@ -66,9 +57,7 @@ class SystemNodeProviderTest extends TestCase
      */
     public function testGetNodeReturnsFalseWhenNodeIsNotFound()
     {
-        $provider = new SystemNodeProvider();
-
-        $this->setIfconfig($provider, 'some string that does not match the mac address');
+        $provider = new SystemNodeProvider('some string that does not match the mac address');
 
         $node = $provider->getNode();
         $this->assertFalse($node);
@@ -78,9 +67,7 @@ class SystemNodeProviderTest extends TestCase
      */
     public function testGetNodeWillNotExecuteSystemCallIfFailedFirstTime()
     {
-        $provider = new SystemNodeProvider();
-
-        $this->setIfconfig($provider, 'some string that does not match the mac address');
+        $provider = new SystemNodeProvider('some string that does not match the mac address');
 
         $provider->getNode();
         $provider->getNode();
@@ -116,9 +103,7 @@ class SystemNodeProviderTest extends TestCase
      */
     public function testGetNodeReturnsSameNodeUponSubsequentCalls()
     {
-        $provider = new SystemNodeProvider();
-
-        $this->setIfconfig($provider, PHP_EOL . 'AA-BB-CC-DD-EE-FF' . PHP_EOL);
+        $provider = new SystemNodeProvider(PHP_EOL . 'AA-BB-CC-DD-EE-FF' . PHP_EOL);
 
         $node = $provider->getNode();
         $node2 = $provider->getNode();
@@ -129,20 +114,9 @@ class SystemNodeProviderTest extends TestCase
      */
     public function testSubsequentCallsToGetNodeDoNotRecallIfconfig()
     {
-        $provider = new SystemNodeProvider();
-
-        $this->setIfconfig($provider, PHP_EOL . 'AA-BB-CC-DD-EE-FF' . PHP_EOL);
+        $provider = new SystemNodeProvider(PHP_EOL . 'AA-BB-CC-DD-EE-FF' . PHP_EOL);
 
         $provider->getNode();
         $provider->getNode();
-    }
-
-    private function setIfconfig($provider, $value)
-    {
-        $reflectionObject = new \ReflectionObject($provider);
-        $reflectionProperty = $reflectionObject->getProperty('ifconfig');
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($provider, $value);
-        $reflectionProperty->setAccessible(false);
     }
 }
